@@ -1,0 +1,169 @@
+console.clear();
+d3.json("https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/video-game-sales-data.json").
+then(res => {
+
+  const dataset = res;
+
+  const svgWidth = 1750;
+  const svgHeight = 1000;
+
+  const padding = 250;
+
+  const color = d3.scaleOrdinal(['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+  '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+  '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
+  '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+  '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC',
+  '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+  '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680',
+  '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+  '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3',
+  '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF']);
+
+  const svg = d3.select("svg").
+  attr("width", svgWidth).
+  attr("height", svgHeight);
+
+  const tooltip = d3.tip().
+  attr("id", "tooltip").
+  html(x => {
+    d3.select("#tooltip").attr("data-value", x.data.value);
+    return `Name:${x.data.name} <br> Category:${x.data.category} <br> Value:${x.data.value}`;
+  });
+
+  svg.call(tooltip);
+
+
+
+  const treemap = d3.treemap().
+  size([1000, 1000]).
+  padding(2);
+
+  const root = d3.hierarchy(dataset).
+  sum(x => x.value).
+  sort((x, y) => y.value - x.value);
+
+  treemap(root);
+
+
+  const rect = svg.selectAll("g").
+  data(root.leaves()).
+  enter().
+  append("g").
+  attr('transform', x => `translate(${x.x0}, ${x.y0})`);
+
+  rect.append("rect").
+  attr("class", "tile").
+  attr("data-name", x => x.data.name).
+  attr("data-category", x => x.data.category).
+  attr("data-value", x => x.data.value).
+  attr('width', x => x.x1 - x.x0).
+  attr('height', x => x.y1 - x.y0).
+  attr("fill", x => color(x.data.category)).
+  on('mouseover', tooltip.show).
+  on('mouseout', tooltip.hide);
+
+  rect.append("text").
+  attr("class", "rect-text").
+  selectAll("tspan").
+  data(x => x.data.name.split(" ")).
+  enter().
+  append("tspan").
+  attr('x', 5).
+  attr('y', (x, i) => 15 + i * 15).
+  text(x => x);
+
+
+  const legend = svg.append("g").
+  attr("id", "legend");
+
+  legend.selectAll("rect").
+  data(dataset.children).
+  enter().
+  append("rect").
+  attr("class", "legend-item").
+  attr("x", (x, i) => {
+
+    if (i < 4) {
+      return 775 + padding;
+    } else
+    if (i < 8) {
+      return 875 + padding;
+    } else
+    if (i < 12) {
+      return 975 + padding;
+    } else
+    if (i < 16) {
+      return 1075 + padding;
+    } else
+    {
+      return 1175 + padding;
+    }
+
+  }).
+  attr("y", (x, i) => {
+    if (i < 4) {
+      return 200 + 40 * i;
+    } else
+    if (i < 8) {
+      return 200 + 40 * (i % 4);
+    } else
+    if (i < 12) {
+      return 200 + 40 * (i % 8);
+    } else
+    if (i < 16) {
+      return 200 + 40 * (i % 12);
+    } else
+    {
+      return 200 + 40 * (i % 16);
+    }
+  }).
+  attr("height", 25).
+  attr("width", 25).
+  attr("fill", x => color(x.children[0].category));
+
+
+  legend.selectAll("text").
+  data(dataset.children).
+  enter().
+  append("text").
+  attr("class", "legend-text").
+  attr("x", (x, i) => {
+    if (i < 4) {
+      return 810 + padding;
+    } else
+    if (i < 8) {
+      return 910 + padding;
+    } else
+    if (i < 12) {
+      return 1010 + padding;
+    } else
+    if (i < 16) {
+      return 1110 + padding;
+    } else
+    {
+      return 1210 + padding;
+    }
+
+  }).
+  attr("y", (x, i) => {
+    if (i < 4) {
+      return 215 + 40 * i;
+    } else
+    if (i < 8) {
+      return 215 + 40 * (i % 4);
+    } else
+    if (i < 12) {
+      return 215 + 40 * (i % 8);
+    } else
+    if (i < 16) {
+      return 215 + 40 * (i % 12);
+    } else
+    {
+      return 215 + 40 * (i % 16);
+    }
+  }).
+  text(x => x.children[0].category);
+
+
+});

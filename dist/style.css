@@ -1,0 +1,26 @@
+#wrapper{
+  text-align: center
+}
+
+
+.tile{
+  stroke: black;
+  stroke-width:1;
+}
+
+#tooltip {
+  line-height: 1;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.legend-text{
+  font-size:12px
+}
+
+.rect-text{
+  font-size: 10px;
+}
